@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nikah Ceremony — Dil Nisha weds Mohd. Arbaaz Rayeen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ivory:#FBF3E6; --ivory-2:#F6E9D8;
+    --blush:#EFC6C2; --rose:#D98B90;
+    --gold:#C19A3D;  --gold-deep:#A07A1E;
+    --maroon:#7A0E29; --maroon-2:#8E1B3A;
+    --ink:#6B3B2E;   --leaf:#6E8B5A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    min-height:100vh; display:grid; place-items:center;
+    background:radial-gradient(120% 90% at 50% 0%, #2a1119 0%, #17090e 55%, #0d0609 100%);
+    padding:calc(env(safe-area-inset-top) + 12px) 10px 14px;
+    font-family:"Cormorant Garamond",Georgia,serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ───────── CARD SHELL ───────── */
+  .card{
+    --u:4px;
+    position:relative;
+    width:min(94vw, 52vh);
+    aspect-ratio:9/16; max-height:92vh;
+    overflow:hidden; border-radius:calc(var(--u)*1.5);
+    background:radial-gradient(90% 60% at 50% 12%, #FFFCF5 0%, var(--ivory) 45%, var(--ivory-2) 100%);
+    box-shadow:0 calc(var(--u)*.6) calc(var(--u)*4) rgba(0,0,0,.55), 0 0 0 1px rgba(193,154,61,.35);
+    isolation:isolate;
+  }
+  .card::after{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:9;
+    opacity:.5;mix-blend-mode:multiply;
+    background-image:
+      repeating-linear-gradient(112deg, rgba(160,122,30,.035) 0 2px, transparent 2px 5px),
+      repeating-linear-gradient(8deg, rgba(122,14,41,.022) 0 3px, transparent 3px 7px);
+  }
+
+  /* girih star watermark */
+  .girih{position:absolute;inset:0;z-index:1;opacity:.085;pointer-events:none}
+
+  /* ───────── FRAME ───────── */
+  .frame{position:absolute;inset:calc(var(--u)*2.4);pointer-events:none;z-index:4}
+  .frame i{position:absolute;inset:0;display:block;border-radius:calc(var(--u)*.6)}
+  .frame i.outer{border:calc(var(--u)*.22) solid var(--gold);opacity:.75}
+  .frame i.band{inset:calc(var(--u)*1.1);border:calc(var(--u)*1.1) solid var(--blush);opacity:.55}
+  .frame i.inner{inset:calc(var(--u)*2.6);border:calc(var(--u)*.14) solid var(--gold-deep);opacity:.55}
+
+  .corner{position:absolute;width:calc(var(--u)*30);z-index:6;pointer-events:none}
+  .corner.tl{top:calc(var(--u)*-1);left:calc(var(--u)*-1)}
+  .corner.tr{top:calc(var(--u)*-1);right:calc(var(--u)*-1);transform:scaleX(-1)}
+  .corner.bl{bottom:calc(var(--u)*-1);left:calc(var(--u)*-1);transform:scaleY(-1)}
+  .corner.br{bottom:calc(var(--u)*-1);right:calc(var(--u)*-1);transform:scale(-1)}
+
+  /* crescent finial */
+  .finial{
+    position:absolute;top:calc(var(--u)*5);left:50%;transform:translateX(-50%);
+    width:calc(var(--u)*11);z-index:6;pointer-events:none;
+  }
+  .finial .star{transform-origin:center;animation:twinkle 4.5s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.45}50%{opacity:1}}
+
+  .lantern{
+    position:absolute;top:0;width:calc(var(--u)*11);z-index:6;pointer-events:none;
+    transform-origin:50% 0;animation:sway 7s ease-in-out infinite;
+  }
+  .lantern.l{left:calc(var(--u)*9)}
+  .lantern.r{right:calc(var(--u)*9);animation-delay:-3.4s}
+  .lantern .flame{animation:glow 3.6s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+  @keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+
+  /* ───────── PETALS ───────── */
+  .petals{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
+  .petal{
+    position:absolute;top:calc(var(--u)*-8);
+    width:calc(var(--u)*2.6);height:calc(var(--u)*2);
+    background:radial-gradient(70% 70% at 30% 30%, #FBE0DC, var(--rose));
+    border-radius:60% 30% 60% 30%;opacity:0;animation:fall linear infinite;
+  }
+  @keyframes fall{
+    0%{opacity:0;transform:translate3d(0,0,0) rotate(0)}
+    8%{opacity:.85} 85%{opacity:.7}
+    100%{opacity:0;transform:translate3d(var(--dx),calc(var(--u)*180),0) rotate(680deg)}
+  }
+
+  /* ───────── STAGE ───────── */
+  .stage{position:absolute;inset:calc(var(--u)*15) calc(var(--u)*8.5) calc(var(--u)*10);z-index:5;display:grid;place-items:center}
+  .scene{grid-area:1/1;width:100%;text-align:center;color:var(--maroon);opacity:0;visibility:hidden;transition:opacity .7s ease}
+  .scene.on{opacity:1;visibility:visible}
+  .scene.out{opacity:0;transition:opacity .55s ease}
+
+  .scene.on .r{animation:rise .95s cubic-bezier(.2,.8,.25,1) both;animation-delay:var(--d,0s)}
+  @keyframes rise{
+    from{opacity:0;transform:translateY(calc(var(--u)*2.2)) scale(.985);filter:blur(3px)}
+    to{opacity:1;transform:none;filter:blur(0)}
+  }
+  .scene.on .g{animation:grow 1.1s cubic-bezier(.2,.8,.25,1) both;animation-delay:var(--d,0s)}
+  @keyframes grow{from{opacity:0;transform:scaleX(.1)}to{opacity:1;transform:scaleX(1)}}
+
+  /* ───────── TYPE ───────── */
+  .ar{font-family:"Amiri",serif;direction:rtl;color:var(--gold-deep)}
+  .bismillah{font-size:calc(var(--u)*11);line-height:1.7}
+  .ayah{font-size:calc(var(--u)*7);line-height:2.05;color:var(--maroon-2)}
+  .dua{font-size:calc(var(--u)*7.6);line-height:1.95}
+
+  .script{font-family:"Great Vibes",cursive;color:var(--maroon);line-height:1.14;font-weight:400}
+  .s-xl{font-size:calc(var(--u)*17)}
+  .s-lg{font-size:calc(var(--u)*13)}
+  .s-md{font-size:calc(var(--u)*10.5)}
+
+  .serif{font-family:"Cormorant Garamond",serif;font-style:italic}
+  .lede{font-size:calc(var(--u)*5.4);line-height:1.55;color:var(--ink)}
+  .note{font-size:calc(var(--u)*4.6);line-height:1.6;color:var(--ink)}
+  .small{font-size:calc(var(--u)*4.1);line-height:1.62;color:var(--ink)}
+  .tagline{
+    font-size:calc(var(--u)*4.8);letter-spacing:calc(var(--u)*.8);
+    color:var(--gold-deep);font-variant:small-caps;font-style:normal;
+  }
+  .emph{color:var(--maroon-2);font-weight:600}
+
+  .rule{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);margin:calc(var(--u)*2.8) auto;width:70%}
+  .rule span{height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .rule b{width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);background:var(--gold);border-radius:20% 60% 20% 60%;transform:rotate(45deg)}
+
+  .weds{
+    display:inline-block;padding:calc(var(--u)*.9) calc(var(--u)*4.5);
+    border:1px solid var(--gold);border-radius:999px;
+    font-family:"Cormorant Garamond",serif;font-style:normal;font-variant:small-caps;
+    letter-spacing:calc(var(--u)*.7);font-size:calc(var(--u)*4.6);
+    color:var(--gold-deep);background:rgba(255,255,255,.45);
+    margin:calc(var(--u)*3.4) 0;
+  }
+
+  .prog{margin-top:calc(var(--u)*3.2);display:grid;gap:calc(var(--u)*2.5)}
+  .prog div{display:flex;align-items:baseline;gap:calc(var(--u)*1.4);font-size:calc(var(--u)*5);color:var(--ink);font-style:italic}
+  .prog div i{flex:1;border-bottom:1px dotted rgba(160,122,30,.7);transform:translateY(-.25em)}
+  .prog div b{font-weight:600;color:var(--maroon-2);font-style:normal}
+
+  .names-list{display:flex;flex-wrap:wrap;justify-content:center;gap:calc(var(--u)*1) calc(var(--u)*3);font-size:calc(var(--u)*4.5);color:var(--ink);font-style:italic}
+
+  .mosque{width:78%;margin:calc(var(--u)*3) auto 0;display:block;opacity:.85}
+  .scene.on .mosque{animation:ink 2.6s ease both;animation-delay:var(--d,0s)}
+  @keyframes ink{from{opacity:0}to{opacity:.85}}
+
+  .arch path{fill:none;stroke:var(--gold);stroke-width:1.6;stroke-dasharray:1200;stroke-dashoffset:1200}
+  .scene.on .arch path{animation:draw 3.4s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  /* ───────── CONTROLS ───────── */
+  .bar{position:absolute;left:0;right:0;bottom:0;height:calc(var(--u)*.9);background:rgba(122,14,41,.12);z-index:12}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--maroon-2))}
+
+  .veil{position:absolute;inset:0;z-index:14;display:grid;place-items:center;background:rgba(251,243,230,.93);backdrop-filter:blur(2px);transition:opacity .5s ease}
+  .veil.gone{opacity:0;pointer-events:none}
+  .veil .inner{text-align:center;display:grid;gap:calc(var(--u)*2.5);justify-items:center;padding:0 10%}
+  .btn{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:calc(var(--u)*5.6);
+    color:var(--maroon);background:transparent;border:1px solid var(--gold);border-radius:999px;
+    padding:calc(var(--u)*2) calc(var(--u)*7);cursor:pointer;transition:background .25s,color .25s;
+  }
+  .btn:hover,.btn:focus-visible{background:var(--maroon);color:var(--ivory);outline:none}
+  .btn:focus-visible{box-shadow:0 0 0 3px rgba(193,154,61,.6)}
+  .hint{font-size:calc(var(--u)*3.9);color:var(--ink);opacity:.75;font-style:italic}
+
+  @media (prefers-reduced-motion:reduce){
+    .petal,.lantern,.lantern .flame,.finial .star{animation:none;opacity:.7}
+    .scene.on .r,.scene.on .g,.scene.on .arch path,.scene.on .mosque{animation-duration:.01s}
+    .arch path{stroke-dashoffset:0}
+  }
+</style>
+
+<div class="card" id="card">
+
+  <svg class="girih" aria-hidden="true">
+    <defs>
+      <pattern id="star8" width="64" height="64" patternUnits="userSpaceOnUse">
+        <g fill="none" stroke="#A07A1E" stroke-width="1.1">
+          <path d="M14 14H50V50H14Z"/>
+          <path d="M32 6 58 32 32 58 6 32Z"/>
+          <path d="M0 0 14 14M64 0 50 14M0 64 14 50M64 64 50 50"/>
+        </g>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#star8)"/>
+  </svg>
+
+  <div class="frame"><i class="outer"></i><i class="band"></i><i class="inner"></i></div>
+
+  <svg class="corner tl" viewBox="0 0 120 120" aria-hidden="true">
+    <g fill="none" stroke="#6E8B5A" stroke-width="2" opacity=".9">
+      <path d="M8 34c18 2 30 12 38 26M18 16c14 10 22 22 26 38M40 10c4 16 2 30-4 44"/>
+      <path d="M92 18c-14 4-24 12-30 24M104 40c-16 0-28 6-36 18"/>
+    </g>
+    <g fill="#6E8B5A" opacity=".8">
+      <ellipse cx="22" cy="40" rx="9" ry="4.5" transform="rotate(-28 22 40)"/>
+      <ellipse cx="46" cy="24" rx="8" ry="4" transform="rotate(38 46 24)"/>
+      <ellipse cx="86" cy="30" rx="8.5" ry="4.2" transform="rotate(20 86 30)"/>
+      <ellipse cx="62" cy="62" rx="9" ry="4.4" transform="rotate(-14 62 62)"/>
+    </g>
+    <g>
+      <circle cx="34" cy="28" r="14" fill="#E9A2A4"/><circle cx="34" cy="28" r="9" fill="#F2BDBD"/><circle cx="34" cy="28" r="4.5" fill="#D98B90"/>
+      <circle cx="70" cy="16" r="9" fill="#F2C7C4"/><circle cx="70" cy="16" r="4" fill="#E9A2A4"/>
+      <circle cx="16" cy="62" r="10" fill="#EFB7B4"/><circle cx="16" cy="62" r="4.5" fill="#D98B90"/>
+      <circle cx="58" cy="44" r="6" fill="#FBEDE6"/><circle cx="58" cy="44" r="2.4" fill="#C19A3D"/>
+      <circle cx="90" cy="46" r="5.5" fill="#FBEDE6"/><circle cx="90" cy="46" r="2.2" fill="#C19A3D"/>
+      <circle cx="40" cy="78" r="5.5" fill="#FBEDE6"/><circle cx="40" cy="78" r="2.2" fill="#C19A3D"/>
+    </g>
+  </svg>
+  <svg class="corner tr" viewBox="0 0 120 120" aria-hidden="true"></svg>
+  <svg class="corner bl" viewBox="0 0 120 120" aria-hidden="true"></svg>
+  <svg class="corner br" viewBox="0 0 120 120" aria-hidden="true"></svg>
+
+  <svg class="finial" viewBox="0 0 60 48" aria-hidden="true">
+    <path d="M38 8a17 17 0 1 0 0 32 21 21 0 1 1 0-32z" fill="#C19A3D" opacity=".9"/>
+    <path class="star" d="M18 16l2.6 6.4L27 25l-6.4 2.6L18 34l-2.6-6.4L9 25l6.4-2.6z" fill="#A07A1E"/>
+  </svg>
+
+  <svg class="lantern l" viewBox="0 0 40 120" aria-hidden="true">
+    <path d="M20 0v26" stroke="#C19A3D" stroke-width="1.4"/><path d="M20 26l8 8h-16z" fill="#C19A3D"/>
+    <path d="M8 34h24l4 34c0 10-8 16-16 16s-16-6-16-16z" fill="#F6E3C0" stroke="#A07A1E" stroke-width="1.6"/>
+    <ellipse class="flame" cx="20" cy="56" rx="8" ry="12" fill="#F0B94B"/>
+    <path d="M8 34h24" stroke="#A07A1E" stroke-width="2"/>
+    <path d="M14 40v28M26 40v28M20 38v32" stroke="#C19A3D" stroke-width=".9" opacity=".8"/>
+    <path d="M20 84v10M16 96h8l-4 8z" stroke="#C19A3D" stroke-width="1.3" fill="#C19A3D"/>
+  </svg>
+  <svg class="lantern r" viewBox="0 0 40 120" aria-hidden="true">
+    <path d="M20 0v26" stroke="#C19A3D" stroke-width="1.4"/><path d="M20 26l8 8h-16z" fill="#C19A3D"/>
+    <path d="M8 34h24l4 34c0 10-8 16-16 16s-16-6-16-16z" fill="#F6E3C0" stroke="#A07A1E" stroke-width="1.6"/>
+    <ellipse class="flame" cx="20" cy="56" rx="8" ry="12" fill="#F0B94B"/>
+    <path d="M8 34h24" stroke="#A07A1E" stroke-width="2"/>
+    <path d="M14 40v28M26 40v28M20 38v32" stroke="#C19A3D" stroke-width=".9" opacity=".8"/>
+    <path d="M20 84v10M16 96h8l-4 8z" stroke="#C19A3D" stroke-width="1.3" fill="#C19A3D"/>
+  </svg>
+
+  <div class="petals" id="petals" aria-hidden="true"></div>
+
+  <div class="stage" id="stage">
+
+    <!-- 1 · Bismillah -->
+    <section class="scene" data-dur="6400">
+      <svg class="arch" viewBox="0 0 300 420" aria-hidden="true" style="width:86%;margin:0 auto calc(var(--u)*-36);display:block">
+        <path d="M20 400V170C20 100 75 40 150 14c75 26 130 86 130 156v230"/>
+      </svg>
+      <div class="ar bismillah r" style="--d:.9s">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+      <div class="rule g" style="--d:1.9s"><span></span><b></b><span></span></div>
+      <p class="serif lede r" style="--d:2.4s">In the name of Allah,<br>the most beneficent &amp; merciful</p>
+    </section>
+
+    <!-- 2 · Title -->
+    <section class="scene" data-dur="5600">
+      <div class="ar r" style="--d:.1s;font-size:calc(var(--u)*9)">نِكَاح</div>
+      <div class="script s-xl r" style="--d:.6s;margin-top:calc(var(--u)*2)">Nikah</div>
+      <div class="script s-xl r" style="--d:1s">Ceremony</div>
+      <div class="rule g" style="--d:1.8s"><span></span><b></b><span></span></div>
+      <p class="tagline serif r" style="--d:2.1s">Wedding Invitation</p>
+    </section>
+
+    <!-- 3 · Ayah -->
+    <section class="scene" data-dur="9000">
+      <div class="ar ayah r" style="--d:.2s">
+        وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ<br>
+        أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ<br>
+        بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
+      </div>
+      <div class="rule g" style="--d:1.9s"><span></span><b></b><span></span></div>
+      <p class="serif lede r" style="--d:2.3s;line-height:1.7">
+        Among His signs is that He created<br>partners for you from among yourselves,<br>
+        so that you may find peace in them,<br>and He placed love and mercy between you
+      </p>
+      <p class="tagline serif r" style="--d:3.2s;margin-top:calc(var(--u)*2.5)">Surah Ar-Rum · 30:21</p>
+    </section>
+
+    <!-- 4 · Hosts -->
+    <section class="scene" data-dur="6800">
+      <p class="tagline serif r" style="--d:.2s">Grand Father</p>
+      <p class="serif lede emph r" style="--d:.5s">Haji Shakoor Ahmad</p>
+      <p class="tagline serif r" style="--d:1.1s;margin-top:calc(var(--u)*2)">Grand Mother</p>
+      <p class="serif lede emph r" style="--d:1.4s">Hajjan Meher Jahan</p>
+      <div class="rule g" style="--d:2.1s"><span></span><b></b><span></span></div>
+      <p class="serif lede r" style="--d:2.5s">request the pleasure of your company<br>on the auspicious occasion of the<br><span class="script s-md">Nikah Ceremony</span></p>
+    </section>
+
+    <!-- 5 · Couple, one page -->
+    <section class="scene" data-dur="10500">
+      <p class="tagline serif r" style="--d:.2s">of their loving grand daughter</p>
+      <div class="script s-lg r" style="--d:.6s">Dil Nisha</div>
+      <p class="serif note r" style="--d:1.4s">D/o Mr. Mohd. Dilshad Rayeen</p>
+      <p class="serif small r" style="--d:1.7s">Nala Fidai Khan, Kabutar Wali Gudri, Farrukhabad</p>
+
+      <div class="weds r" style="--d:2.4s">weds</div>
+
+      <div class="script s-md r" style="--d:3s">Mohd. Arbaaz Rayeen</div>
+      <p class="serif note r" style="--d:3.8s">S/o Mr. Habeeb Rayeen</p>
+      <p class="serif small r" style="--d:4.1s">Julahpuri, Post Ekdil, Etawah</p>
+
+      <svg class="mosque" viewBox="0 0 300 120" style="--d:4.8s" aria-hidden="true">
+        <g fill="none" stroke="#C19A3D" stroke-width="1.5">
+          <path d="M150 20c14 10 22 22 22 34 0 14-10 24-22 24s-22-10-22-24c0-12 8-24 22-34z"/>
+          <circle cx="150" cy="12" r="4"/>
+          <path d="M104 52c9 6 14 14 14 22 0 9-6 16-14 16s-14-7-14-16c0-8 5-16 14-22z"/>
+          <path d="M196 52c9 6 14 14 14 22 0 9-6 16-14 16s-14-7-14-16c0-8 5-16 14-22z"/>
+          <path d="M70 46v54M230 46v54M52 60v40M248 60v40"/>
+          <path d="M70 40c4 4 6 7 6 10h-12c0-3 2-6 6-10zM230 40c4 4 6 7 6 10h-12c0-3 2-6 6-10zM52 54c3 3 5 6 5 8h-10c0-2 2-5 5-8zM248 54c3 3 5 6 5 8h-10c0-2 2-5 5-8z"/>
+          <path d="M40 100h220M88 78v22M212 78v22"/>
+          <path d="M150 100V84c0-7-5-12-11-12s-11 5-11 12v16"/>
+        </g>
+      </svg>
+    </section>
+
+    <!-- 6 · Programme -->
+    <section class="scene" data-dur="9200">
+      <p class="tagline serif r" style="--d:.2s">Programme</p>
+      <p class="serif lede emph r" style="--d:.7s;margin-top:calc(var(--u)*1.5)">Saturday, 17 October 2026</p>
+      <div class="rule g" style="--d:1.2s"><span></span><b></b><span></span></div>
+      <div class="prog">
+        <div class="r" style="--d:1.6s"><em>Dawat e Tuam</em><i></i><b>7:00 pm</b></div>
+        <div class="r" style="--d:2.1s"><em>Arrival of Barat</em><i></i><b>8:00 pm</b></div>
+        <div class="r" style="--d:2.6s"><em>Nikah</em><i></i><b>10:00 pm</b></div>
+        <div class="r" style="--d:3.1s"><em>Rukhsati</em><i></i><b>11:00 pm</b></div>
+      </div>
+    </section>
+
+    <!-- 7 · Venue -->
+    <section class="scene" data-dur="6400">
+      <p class="tagline serif r" style="--d:.2s">Venue</p>
+      <div class="script s-lg r" style="--d:.7s">Meera Lawn</div>
+      <div class="rule g" style="--d:1.5s"><span></span><b></b><span></span></div>
+      <p class="serif lede r" style="--d:1.9s">Town Hall Ke Niche, Karbala Road,<br>Chungi Ke Pass, Farrukhabad</p>
+    </section>
+
+    <!-- 8 · Compliments -->
+    <section class="scene" data-dur="7600">
+      <p class="tagline serif r" style="--d:.2s">With best compliments from</p>
+      <div class="names-list r" style="--d:.7s;margin-top:calc(var(--u)*2.5)">
+        <span>Jaleel Ahmad</span><span>Irshad Rayeen</span><span>Anwar Rayeen</span>
+        <span>Riyaz Rayeen</span><span>Chand Rayeen</span><span>Taufeeq Rayeen</span>
+        <span>Mohd. Danish</span><span>Mohd. Zaid</span>
+      </div>
+      <div class="rule g" style="--d:1.6s"><span></span><b></b><span></span></div>
+      <div class="names-list r" style="--d:2s">
+        <span>Salman</span><span>Adil</span><span>Sameer</span><span>Sohail</span>
+        <span>Sahil</span><span>Aizaz</span><span>Izhaar</span><span>Amaan</span>
+        <span>Ishaan</span><span>Rehaan</span>
+      </div>
+      <p class="serif small r" style="--d:2.5s;margin-top:calc(var(--u)*2.5)">and all relatives &amp; friends</p>
+    </section>
+
+    <!-- 9 · Dua -->
+    <section class="scene" data-dur="8200">
+      <div class="ar dua r" style="--d:.2s">
+        بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا<br>وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+      </div>
+      <div class="rule g" style="--d:1.6s"><span></span><b></b><span></span></div>
+      <p class="serif lede r" style="--d:2s;line-height:1.7">
+        May Allah bless you both,<br>and unite you in goodness
+      </p>
+      <div class="script s-lg r" style="--d:3s;margin-top:calc(var(--u)*2)">Aameen</div>
+      <p class="serif note r" style="--d:4s;margin-top:calc(var(--u)*3)">Dil Nisha &amp; Mohd. Arbaaz Rayeen<br>17 · 10 · 2026</p>
+    </section>
+
+  </div>
+
+  <div class="bar"><i id="prog"></i></div>
+
+  <div class="veil" id="veil">
+    <div class="inner">
+      <div class="ar" style="font-size:calc(var(--u)*8)">نِكَاح</div>
+      <div class="script s-md">Nikah Ceremony</div>
+      <p class="serif note">Dil Nisha weds Mohd. Arbaaz Rayeen</p>
+      <button class="btn" id="play">Play invitation</button>
+      <p class="hint">Runs about 70 seconds</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const card   = document.getElementById('card');
+  const scenes = Array.from(document.querySelectorAll('.scene'));
+  const veil   = document.getElementById('veil');
+  const btn    = document.getElementById('play');
+  const prog   = document.getElementById('prog');
+
+  function unit(){ card.style.setProperty('--u', (card.clientWidth/100)+'px'); }
+  unit();
+  addEventListener('resize', unit);
+  new ResizeObserver(unit).observe(card);
+
+  const src = document.querySelector('.corner.tl');
+  document.querySelectorAll('.corner.tr,.corner.bl,.corner.br').forEach(c=>{ c.innerHTML = src.innerHTML; });
+
+  const petals = document.getElementById('petals');
+  for(let i=0;i<20;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = (Math.random()*100)+'%';
+    p.style.setProperty('--dx', ((Math.random()*36)-18)+'px');
+    p.style.animationDuration = (11+Math.random()*10)+'s';
+    p.style.animationDelay = (-Math.random()*18)+'s';
+    p.style.transform = 'scale('+(0.6+Math.random()*0.8)+')';
+    if(Math.random()>.6) p.style.background='radial-gradient(70% 70% at 30% 30%, #FFF6EC, #F0D9A8)';
+    petals.appendChild(p);
+  }
+
+  const total = scenes.reduce((a,s)=>a + (+s.dataset.dur), 0);
+  let timers = [];
+  const clear = ()=>{ timers.forEach(clearTimeout); timers = []; };
+
+  function play(){
+    clear();
+    scenes.forEach(s=>s.classList.remove('on','out'));
+    prog.style.transition='none'; prog.style.width='0%';
+    void prog.offsetWidth;
+    prog.style.transition='width '+total+'ms linear';
+    prog.style.width='100%';
+
+    let t = 0;
+    scenes.forEach(s=>{
+      const dur = +s.dataset.dur;
+      timers.push(setTimeout(()=>{
+        scenes.forEach(o=>{ if(o!==s) o.classList.remove('on'); });
+        s.classList.add('on');
+      }, t));
+      timers.push(setTimeout(()=>{ s.classList.add('out'); }, t+dur-550));
+      t += dur;
+    });
+
+    timers.push(setTimeout(()=>{
+      scenes.forEach(s=>s.classList.remove('on','out'));
+      scenes[scenes.length-1].classList.add('on');
+      btn.textContent = 'Play again';
+      veil.classList.remove('gone');
+      btn.focus();
+    }, t+300));
+  }
+
+  btn.addEventListener('click', ()=>{ veil.classList.add('gone'); play(); });
+})();
+</script>
+</html>
