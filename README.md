@@ -10,10 +10,11 @@ An animated, self-contained HTML invitation card (9:16, mobile-first), live at
 
 ## Music
 
-Tapping **Play invitation** also starts a soft plucked arpeggio in maqam Hijaz
-over a low drone. It is generated in the browser with the Web Audio API, so
-there is no audio file to download and nothing to license. The note button in
-the bottom-right corner mutes and unmutes it.
+Tapping **Play invitation** also starts a light celesta figure in D major over
+a warm chord pad, with a soft hand-drum lilt — four bars of D – Bm – G – A in
+two alternating variations. It is generated in the browser with the Web Audio
+API, so there is no audio file to download and nothing to license. The note
+button in the bottom-right corner mutes and unmutes it.
 
 To use your own track instead, drop the file next to `index.html` and name it
 near the top of the `MUSIC_SRC` line in the script:

@@ -153,6 +153,12 @@
   .scene.on .mosque{animation:ink 2.6s ease both;animation-delay:var(--d,0s)}
   @keyframes ink{from{opacity:0}to{opacity:.85}}
 
+  /* the arch drives scene 1's layout: it fills the stage and the text sits
+     inside it, centred between its straight sides rather than under them */
+  .s-arch{position:relative}
+  .s-arch .arch{width:96%;margin:0 auto;display:block}
+  .in-arch{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);width:77%}
+
   .arch path{fill:none;stroke:var(--gold);stroke-width:1.6;stroke-dasharray:1200;stroke-dashoffset:1200}
   .scene.on .arch path{animation:draw 3.4s ease forwards}
   @keyframes draw{to{stroke-dashoffset:0}}
@@ -268,13 +274,15 @@
   <div class="stage" id="stage">
 
     <!-- 1 · Bismillah -->
-    <section class="scene" data-dur="6400">
-      <svg class="arch" viewBox="0 0 300 420" aria-hidden="true" style="width:86%;margin:0 auto calc(var(--u)*-36);display:block">
+    <section class="scene s-arch" data-dur="6400">
+      <svg class="arch" viewBox="0 0 300 420" aria-hidden="true">
         <path d="M20 400V170C20 100 75 40 150 14c75 26 130 86 130 156v230"/>
       </svg>
-      <div class="ar bismillah r" style="--d:.9s">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
-      <div class="rule g" style="--d:1.9s"><span></span><b></b><span></span></div>
-      <p class="serif lede r" style="--d:2.4s">In the name of Allah,<br>the most beneficent &amp; merciful</p>
+      <div class="in-arch">
+        <div class="ar bismillah r" style="--d:.9s">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+        <div class="rule g" style="--d:1.9s"><span></span><b></b><span></span></div>
+        <p class="serif lede r" style="--d:2.4s">In the name of Allah,<br>the most beneficent &amp; merciful</p>
+      </div>
     </section>
 
     <!-- 2 · Title -->
@@ -427,8 +435,10 @@
      past the frame. So measure what actually rendered and scale it down to
      the stage width. Re-runs on resize and once the webfont is ready. */
   function fit(){
-    const room = card.clientWidth * .79;              // stage width, less a margin
     arabic.forEach(el=>{
+      const box = el.parentElement, pad = getComputedStyle(box);
+      const room = (box.clientWidth - parseFloat(pad.paddingLeft)
+                                    - parseFloat(pad.paddingRight)) * .96;
       el.style.fontSize = '';                          // back to the CSS size
       for(let pass=0; pass<2; pass++){
         const size = parseFloat(getComputedStyle(el).fontSize);
@@ -500,30 +510,42 @@
       };
     }
 
-    /* ── generated score: a slow plucked arpeggio in maqam Hijaz on D,
-          over a breathing drone, with a long delay for air ── */
-    const SCALE = [293.66,311.13,369.99,392,440,466.16,523.25,587.33]; // D Eb F# G A Bb C D
-    const PHRASES = [
-      [0,2,3,4,null,3,2,null, 4,5,6,null,5,4,2,null],
-      [7,6,5,4,null,3,2,1,    0,null,2,0,null,3,0,null]
+    /* ── generated score: a bright celesta figure in D major over a warm chord
+          pad, with a light hand-drum lilt. Four bars of D – Bm – G – A, in two
+          alternating variations so 70 seconds don't feel like one loop ── */
+    const hz = m => 440 * Math.pow(2, (m - 69)/12);        // midi note → Hz
+    const BARS = [                                         // chord voicings, low → high
+      [62,66,69,74,78,81],   // D  major
+      [59,62,66,71,74,78],   // B  minor
+      [55,59,62,67,71,74],   // G  major
+      [57,61,64,69,73,76]    // A  major
     ];
-    const STEP = .58;
-    let ctx, master, wet, clock, step = 0, at = 0;
+    const FIGURES = [                                      // voice to pluck, per 8th
+      [0,2,4,5,3,4,2,1],
+      [0,3,4,2,5,4,3,2]
+    ];
+    const TUNES = [                                        // the tune: [8th, midi] a bar
+      [[[0,78],[4,81]], [[0,78],[4,76]], [[0,74],[4,71]], [[0,73],[4,76]]],
+      [[[0,81],[5,78]], [[2,76],[6,74]], [[0,71],[4,74]], [[0,73],[6,78]]]
+    ];
+    const STEP = .3;                                       // 8th notes, 100bpm
+    let ctx, master, wet, noise, clock, step = 0, at = 0;
 
-    function pluck(t, freq, peak, dur){
+    function bell(t, midi, peak, dur){
+      const freq = hz(midi);
       const g = ctx.createGain();
       g.gain.setValueAtTime(.0001, t);
-      g.gain.linearRampToValueAtTime(peak, t + .02);
+      g.gain.linearRampToValueAtTime(peak, t + .012);
       g.gain.exponentialRampToValueAtTime(.0001, t + dur);
 
       const lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
-      lp.frequency.setValueAtTime(Math.min(freq*7, 5000), t);
-      lp.frequency.exponentialRampToValueAtTime(Math.max(freq*1.5, 180), t + dur);
+      lp.frequency.setValueAtTime(Math.min(freq*9, 7000), t);
+      lp.frequency.exponentialRampToValueAtTime(Math.max(freq*2, 300), t + dur);
 
       const body = ctx.createOscillator(); body.type = 'triangle'; body.frequency.value = freq;
-      const ring = ctx.createOscillator(); ring.type = 'sine';     ring.frequency.value = freq*2;
-      const rg = ctx.createGain(); rg.gain.value = .22;
+      const ring = ctx.createOscillator(); ring.type = 'sine';     ring.frequency.value = freq*3;
+      const rg = ctx.createGain(); rg.gain.value = .12;            // glassy partial
 
       body.connect(lp); ring.connect(rg).connect(lp);
       lp.connect(g); g.connect(master); g.connect(wet);
@@ -531,19 +553,76 @@
       body.stop(t + dur + .1); ring.stop(t + dur + .1);
     }
 
+    function pad(t, chord, dur){                           // sustained chord beneath
+      chord.slice(0,3).forEach((midi, i)=>{
+        const o = ctx.createOscillator(); o.type = i ? 'sine' : 'triangle';
+        o.frequency.value = hz(midi - 12);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(.0001, t);
+        g.gain.linearRampToValueAtTime(.062, t + .5);
+        g.gain.setValueAtTime(.062, t + dur*.6);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(g).connect(master);
+        o.start(t); o.stop(t + dur + .05);
+      });
+    }
+
+    function dum(t, peak){                                 // soft drum, on the beat
+      const o = ctx.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(150, t);
+      o.frequency.exponentialRampToValueAtTime(64, t + .16);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.linearRampToValueAtTime(peak, t + .01);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .3);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + .35);
+    }
+
+    function tek(t, peak){                                 // light fingertip tap
+      const s = ctx.createBufferSource(); s.buffer = noise;
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass';
+      bp.frequency.value = 2400; bp.Q.value = 1.2;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(peak, t);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+      s.connect(bp).connect(g).connect(master);
+      s.start(t); s.stop(t + .12);
+    }
+
+    function schedule(i, t){                               // one 8th note of the score
+      const bar = Math.floor(i/8), beat = i % 8;
+      const chord = BARS[bar % 4];
+      const set = Math.floor(bar/4) % 2;
+
+      if(beat === 0){
+        pad(t, chord, STEP*8);
+        bell(t, chord[0] - 12, .2, 2.6);                   // bass
+        dum(t, .13);
+      }
+      if(beat === 4) dum(t, .1);
+      if(beat === 3 || beat === 6) tek(t, beat === 6 ? .05 : .035);
+
+      bell(t, chord[FIGURES[set][beat]], beat % 2 ? .1 : .14, 1.5);
+
+      TUNES[set][bar % 4].forEach(([on, midi])=>{
+        if(on === beat) bell(t, midi, .24, 2.4);
+      });
+    }
+
     function tick(){
       while(at < ctx.currentTime + .6){
-        const phrase = PHRASES[Math.floor(step/16) % PHRASES.length];
-        const n = phrase[step % 16];
-        if(n !== null && n !== undefined){
-          const ornament = n === 1;                       // the Eb, kept quiet
-          pluck(at, SCALE[n], ornament ? .16 : .3, ornament ? 1.6 : 2.8);
-        }
-        if(step % 8 === 0) pluck(at, step % 16 ? 220 : 146.83, .2, 4.2);   // A3 / D3
-        if(step % 32 === 12) pluck(at, SCALE[7]*2, .11, 3.4);               // high sparkle
+        schedule(step, at);
         at += STEP;
         step++;
       }
+    }
+
+    function makeNoise(){
+      const b = ctx.createBuffer(1, Math.floor(ctx.sampleRate*.2), ctx.sampleRate);
+      const d = b.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i] = (Math.random()*2 - 1) * (1 - i/d.length);
+      return b;
     }
 
     function build(){
@@ -553,20 +632,12 @@
       master = ctx.createGain(); master.gain.value = 0;
       master.connect(ctx.destination);
 
-      const delay = ctx.createDelay(1); delay.delayTime.value = .38;
-      const fb = ctx.createGain(); fb.gain.value = .3;
-      wet = ctx.createGain(); wet.gain.value = .3;
+      const delay = ctx.createDelay(1); delay.delayTime.value = .45;
+      const fb = ctx.createGain(); fb.gain.value = .22;
+      wet = ctx.createGain(); wet.gain.value = .2;
       wet.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(master);
 
-      [[73.42,.1,.07],[110,.07,.1]].forEach(([freq, level, rate])=>{   // D2 + A2 drone
-        const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
-        const g = ctx.createGain(); g.gain.value = level;
-        const lfo = ctx.createOscillator(); lfo.frequency.value = rate;
-        const depth = ctx.createGain(); depth.gain.value = level*.6;
-        lfo.connect(depth).connect(g.gain);
-        o.connect(g).connect(master);
-        o.start(); lfo.start();
-      });
+      noise = makeNoise();
       return (ready = true);
     }
 
