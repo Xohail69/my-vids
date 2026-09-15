@@ -108,7 +108,9 @@
 
   /* ───────── TYPE ───────── */
   .ar{font-family:"Amiri",serif;direction:rtl;color:var(--gold-deep)}
-  .bismillah{font-size:calc(var(--u)*11);line-height:1.7}
+  /* nowrap keeps the phrase on one line inside the arch; the script shrinks it
+     to fit when the loaded font is wider than Amiri */
+  .bismillah{font-size:calc(var(--u)*9.6);line-height:1.75;white-space:nowrap}
   .ayah{font-size:calc(var(--u)*7);line-height:2.05;color:var(--maroon-2)}
   .dua{font-size:calc(var(--u)*7.6);line-height:1.95}
 
@@ -158,6 +160,26 @@
   /* ───────── CONTROLS ───────── */
   .bar{position:absolute;left:0;right:0;bottom:0;height:calc(var(--u)*.9);background:rgba(122,14,41,.12);z-index:12}
   .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--maroon-2))}
+
+  .sound{
+    position:absolute;bottom:calc(var(--u)*3.4);right:calc(var(--u)*3.4);z-index:13;
+    width:calc(var(--u)*8.5);height:calc(var(--u)*8.5);padding:0;
+    display:grid;place-items:center;cursor:pointer;
+    border:1px solid var(--gold);border-radius:50%;
+    background:rgba(251,243,230,.85);
+    opacity:0;pointer-events:none;transition:opacity .6s ease,background .25s;
+  }
+  .sound.show{opacity:.85;pointer-events:auto}
+  .sound.show:hover,.sound.show:focus-visible{opacity:1;background:var(--ivory);outline:none}
+  .sound.show:focus-visible{box-shadow:0 0 0 3px rgba(193,154,61,.5)}
+  .sound svg{
+    width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);
+    fill:none;stroke:var(--maroon);stroke-width:1.7;stroke-linecap:round;
+  }
+  .sound .wave{opacity:.9;transition:opacity .2s}
+  .sound .slash{opacity:0;transition:opacity .2s}
+  .sound.muted .wave{opacity:0}
+  .sound.muted .slash{opacity:.9}
 
   .veil{position:absolute;inset:0;z-index:14;display:grid;place-items:center;background:rgba(251,243,230,.93);backdrop-filter:blur(2px);transition:opacity .5s ease}
   .veil.gone{opacity:0;pointer-events:none}
@@ -371,13 +393,21 @@
 
   <div class="bar"><i id="prog"></i></div>
 
+  <button class="sound" id="sound" type="button" aria-label="Mute music" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4z"/>
+      <g class="wave"><path d="M15.6 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.8a7.5 7.5 0 0 1 0 10.4"/></g>
+      <path class="slash" d="M15.5 8.5l6 7"/>
+    </svg>
+  </button>
+
   <div class="veil" id="veil">
     <div class="inner">
       <div class="ar" style="font-size:calc(var(--u)*8)">نِكَاح</div>
       <div class="script s-md">Nikah Ceremony</div>
       <p class="serif note">Dil Nisha weds Mohd. Arbaaz Rayeen</p>
       <button class="btn" id="play">Play invitation</button>
-      <p class="hint">Runs about 70 seconds</p>
+      <p class="hint">Runs about 70 seconds · with music<br>tap the note to mute</p>
     </div>
   </div>
 </div>
@@ -390,10 +420,36 @@
   const btn    = document.getElementById('play');
   const prog   = document.getElementById('prog');
 
-  function unit(){ card.style.setProperty('--u', (card.clientWidth/100)+'px'); }
+  const arabic = Array.from(document.querySelectorAll('.ar'));
+
+  /* Arabic lines are set in Amiri, but until it arrives (or if it never does)
+     the fallback face is wider and the longest line — the Bismillah — spills
+     past the frame. So measure what actually rendered and scale it down to
+     the stage width. Re-runs on resize and once the webfont is ready. */
+  function fit(){
+    const room = card.clientWidth * .79;              // stage width, less a margin
+    arabic.forEach(el=>{
+      el.style.fontSize = '';                          // back to the CSS size
+      for(let pass=0; pass<2; pass++){
+        const size = parseFloat(getComputedStyle(el).fontSize);
+        const rng = document.createRange();
+        rng.selectNodeContents(el);
+        let widest = 0;
+        for(const r of rng.getClientRects()) widest = Math.max(widest, r.width);
+        if(widest <= room) break;
+        el.style.fontSize = (size * room / widest) + 'px';
+      }
+    });
+  }
+
+  function unit(){
+    card.style.setProperty('--u', (card.clientWidth/100)+'px');
+    fit();
+  }
   unit();
   addEventListener('resize', unit);
   new ResizeObserver(unit).observe(card);
+  if(document.fonts) document.fonts.ready.then(fit);
 
   const src = document.querySelector('.corner.tl');
   document.querySelectorAll('.corner.tr,.corner.bl,.corner.br').forEach(c=>{ c.innerHTML = src.innerHTML; });
@@ -410,6 +466,148 @@
     if(Math.random()>.6) p.style.background='radial-gradient(70% 70% at 30% 30%, #FFF6EC, #F0D9A8)';
     petals.appendChild(p);
   }
+
+  /* ───────── MUSIC ─────────
+     Drop an audio file next to this page and name it in MUSIC_SRC (e.g.
+     'music.mp3') to use your own track. Left empty, the card plays a soft
+     generated score instead — nothing to download, nothing to license. */
+  const MUSIC_SRC = '';
+
+  const music = (function(){
+    const FADE_IN = 2.5, FADE_OUT = 2.5;
+    let on = true, ready = false;
+
+    /* ── your own file ── */
+    if(MUSIC_SRC){
+      const el = new Audio(MUSIC_SRC);
+      el.loop = true; el.preload = 'auto'; el.volume = 0;
+      let ramp;
+      const to = (target, secs)=>{
+        clearInterval(ramp);
+        const step = (target - el.volume) / (secs*20);
+        ramp = setInterval(()=>{
+          el.volume = Math.min(1, Math.max(0, el.volume + step));
+          if(Math.abs(el.volume - target) < Math.abs(step)){
+            el.volume = target; clearInterval(ramp);
+            if(!target) el.pause();
+          }
+        }, 50);
+      };
+      return {
+        start(){ if(!on) return; el.currentTime = 0; el.play().then(()=>to(.55, FADE_IN)).catch(()=>{}); },
+        stop(){ to(0, FADE_OUT); },
+        toggle(){ on = !on; if(on){ el.play().then(()=>to(.55, 1)).catch(()=>{}); } else to(0, 1); return on; }
+      };
+    }
+
+    /* ── generated score: a slow plucked arpeggio in maqam Hijaz on D,
+          over a breathing drone, with a long delay for air ── */
+    const SCALE = [293.66,311.13,369.99,392,440,466.16,523.25,587.33]; // D Eb F# G A Bb C D
+    const PHRASES = [
+      [0,2,3,4,null,3,2,null, 4,5,6,null,5,4,2,null],
+      [7,6,5,4,null,3,2,1,    0,null,2,0,null,3,0,null]
+    ];
+    const STEP = .58;
+    let ctx, master, wet, clock, step = 0, at = 0;
+
+    function pluck(t, freq, peak, dur){
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.linearRampToValueAtTime(peak, t + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(Math.min(freq*7, 5000), t);
+      lp.frequency.exponentialRampToValueAtTime(Math.max(freq*1.5, 180), t + dur);
+
+      const body = ctx.createOscillator(); body.type = 'triangle'; body.frequency.value = freq;
+      const ring = ctx.createOscillator(); ring.type = 'sine';     ring.frequency.value = freq*2;
+      const rg = ctx.createGain(); rg.gain.value = .22;
+
+      body.connect(lp); ring.connect(rg).connect(lp);
+      lp.connect(g); g.connect(master); g.connect(wet);
+      body.start(t); ring.start(t);
+      body.stop(t + dur + .1); ring.stop(t + dur + .1);
+    }
+
+    function tick(){
+      while(at < ctx.currentTime + .6){
+        const phrase = PHRASES[Math.floor(step/16) % PHRASES.length];
+        const n = phrase[step % 16];
+        if(n !== null && n !== undefined){
+          const ornament = n === 1;                       // the Eb, kept quiet
+          pluck(at, SCALE[n], ornament ? .16 : .3, ornament ? 1.6 : 2.8);
+        }
+        if(step % 8 === 0) pluck(at, step % 16 ? 220 : 146.83, .2, 4.2);   // A3 / D3
+        if(step % 32 === 12) pluck(at, SCALE[7]*2, .11, 3.4);               // high sparkle
+        at += STEP;
+        step++;
+      }
+    }
+
+    function build(){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return false;
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = 0;
+      master.connect(ctx.destination);
+
+      const delay = ctx.createDelay(1); delay.delayTime.value = .38;
+      const fb = ctx.createGain(); fb.gain.value = .3;
+      wet = ctx.createGain(); wet.gain.value = .3;
+      wet.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(master);
+
+      [[73.42,.1,.07],[110,.07,.1]].forEach(([freq, level, rate])=>{   // D2 + A2 drone
+        const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+        const g = ctx.createGain(); g.gain.value = level;
+        const lfo = ctx.createOscillator(); lfo.frequency.value = rate;
+        const depth = ctx.createGain(); depth.gain.value = level*.6;
+        lfo.connect(depth).connect(g.gain);
+        o.connect(g).connect(master);
+        o.start(); lfo.start();
+      });
+      return (ready = true);
+    }
+
+    const level = (target, secs)=>{
+      const t = ctx.currentTime;
+      master.gain.cancelScheduledValues(t);
+      master.gain.setValueAtTime(Math.max(master.gain.value, .0001), t);
+      master.gain.linearRampToValueAtTime(target, t + secs);
+    };
+
+    return {
+      start(){
+        if(!on) return;
+        if(!ready && !build()) return;
+        ctx.resume();
+        step = 0; at = ctx.currentTime + .15;
+        clearInterval(clock); tick(); clock = setInterval(tick, 150);
+        level(.9, FADE_IN);
+      },
+      stop(){
+        if(!ready) return;
+        level(0, FADE_OUT);
+        setTimeout(()=>{ clearInterval(clock); }, FADE_OUT*1000 + 100);
+      },
+      toggle(){
+        on = !on;
+        if(!ready) return on;
+        if(on){ ctx.resume(); clearInterval(clock); tick(); clock = setInterval(tick, 150); level(.9, 1); }
+        else level(0, 1);
+        return on;
+      }
+    };
+  })();
+
+  const soundBtn = document.getElementById('sound');
+  soundBtn.addEventListener('click', ()=>{
+    const on = music.toggle();
+    soundBtn.classList.toggle('muted', !on);
+    soundBtn.setAttribute('aria-pressed', String(!on));
+    soundBtn.setAttribute('aria-label', on ? 'Mute music' : 'Unmute music');
+  });
 
   const total = scenes.reduce((a,s)=>a + (+s.dataset.dur), 0);
   let timers = [];
@@ -434,6 +632,8 @@
       t += dur;
     });
 
+    timers.push(setTimeout(()=>{ music.stop(); }, Math.max(0, t - 2200)));
+
     timers.push(setTimeout(()=>{
       scenes.forEach(s=>s.classList.remove('on','out'));
       scenes[scenes.length-1].classList.add('on');
@@ -443,7 +643,12 @@
     }, t+300));
   }
 
-  btn.addEventListener('click', ()=>{ veil.classList.add('gone'); play(); });
+  btn.addEventListener('click', ()=>{
+    veil.classList.add('gone');
+    soundBtn.classList.add('show');
+    music.start();            // inside the click, so autoplay rules are happy
+    play();
+  });
 })();
 </script>
 </html>
